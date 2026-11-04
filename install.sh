@@ -107,6 +107,8 @@ mkdir -p .claude
 jq --arg m "$MARKETPLACE" --arg r "$KIT_REPO" --argjson cf "$cloudflare" '
   .extraKnownMarketplaces[$m] = {source: {source: "github", repo: $r}, autoUpdate: true}
   | .enabledPlugins["easyrate-core@" + $m] = true
+  | .enabledPlugins["mattpocock-skills@" + $m] = true
+  | .enabledPlugins["taste-skill@" + $m] = true
   | if $cf == 1 then .enabledPlugins["easyrate-cloudflare@" + $m] = true else . end
 ' .claude/settings.json > .claude/settings.json.tmp && mv .claude/settings.json.tmp .claude/settings.json
 say ".claude/settings.json: plugins enabled"

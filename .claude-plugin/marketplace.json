@@ -1,17 +1,31 @@
 {
   "name": "claude-kit",
-  "owner": { "name": "easyrate" },
+  "owner": {
+    "name": "easyrate"
+  },
   "description": "Easyrate's shared Claude Code skills and guardrail hooks",
   "plugins": [
     {
-      "name": "easyrate-core",
-      "source": "./plugins/easyrate-core",
-      "description": "Blocks direct pushes to main; thermo-nuclear code quality review skill"
+      "name": "mattpocock-skills",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/mattpocock/skills.git",
+        "sha": "49dd158d1076134a641b33efb035946536778336"
+      },
+      "description": "Matt Pocock's engineering skills (grilling, TDD, triage, code review, domain modelling, …). Pinned to v1.3.1, the commit Anthropic's official marketplace pins."
     },
     {
-      "name": "easyrate-cloudflare",
-      "source": "./plugins/easyrate-cloudflare",
-      "description": "Blocks agents from deploying or changing a live Cloudflare Worker"
+      "name": "taste-skill",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/Leonxlnx/taste-skill.git",
+        "sha": "12af471f627f866411b4bd785b19646d3672784c"
+      },
+      "strict": false,
+      "skills": [
+        "./skills/taste-skill"
+      ],
+      "description": "tasteskill v2.1.5: art direction for websites, product pages, dashboards and app screens. Pinned to a reviewed commit."
     }
   ]
 }
