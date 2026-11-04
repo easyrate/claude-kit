@@ -1,0 +1,5 @@
+{
+  "name": "easyrate-cloudflare",
+  "description": "Blocks agents from deploying or changing a live Cloudflare Worker",
+  "author": { "name": "easyrate" }
+}

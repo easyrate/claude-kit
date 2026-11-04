@@ -1,0 +1,5 @@
+{
+  "name": "easyrate-core",
+  "description": "Blocks direct pushes to main; thermo-nuclear code quality review skill",
+  "author": { "name": "easyrate" }
+}

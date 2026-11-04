@@ -1,0 +1,17 @@
+{
+  "name": "claude-kit",
+  "owner": { "name": "easyrate" },
+  "description": "Easyrate's shared Claude Code skills and guardrail hooks",
+  "plugins": [
+    {
+      "name": "easyrate-core",
+      "source": "./plugins/easyrate-core",
+      "description": "Blocks direct pushes to main; thermo-nuclear code quality review skill"
+    },
+    {
+      "name": "easyrate-cloudflare",
+      "source": "./plugins/easyrate-cloudflare",
+      "description": "Blocks agents from deploying or changing a live Cloudflare Worker"
+    }
+  ]
+}

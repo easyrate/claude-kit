@@ -1,0 +1,18 @@
+# Installed by claude-kit. The logic lives in easyrate/claude-kit; re-run the
+# claude-kit install command to update this file.
+# Runs when you add the "agent-review" label to a PR.
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  claude-review:
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+    uses: easyrate/claude-kit/.github/workflows/claude-code-review.yml@main
+    secrets: inherit
