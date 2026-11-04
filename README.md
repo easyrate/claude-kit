@@ -39,6 +39,8 @@ Re-running the command is safe. It updates what it installed and leaves the rest
 | --- | --- | --- |
 | `easyrate-core` plugin: hook that blocks `git push` to `main`; `/easyrate-core:thermo-nuclear-code-quality-review` skill | `plugins/easyrate-core` | Automatically (plugin auto-update) |
 | `easyrate-cloudflare` plugin (`--cloudflare`): hook that blocks `wrangler deploy`, `rollback`, `delete`, `secret put/delete`, `npm run deploy`, `scripts/setup.sh`. `wrangler deploy --dry-run` is allowed | `plugins/easyrate-cloudflare` | Automatically |
+| `mattpocock-skills` plugin: Matt Pocock's engineering skills (`/mattpocock-skills:tdd`, `…:grilling`, `…:triage`, `…:code-review`, …) | Upstream [mattpocock/skills](https://github.com/mattpocock/skills), pinned by commit in `.claude-plugin/marketplace.json` | When the pin is bumped here |
+| `taste-skill` plugin: art direction for websites, product pages, dashboards and app screens (`/taste-skill:taste-skill`) | Upstream [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), pinned by commit | When the pin is bumped here |
 | GitHub workflows: `@claude` in issues and PRs; Claude Code Review and the thermo-nuclear review when a PR gets the `agent-review` label | Logic in `.github/workflows/` here; each repo has short caller files | Automatically (reusable workflows, `@main`) |
 | `docs/agents/*.md` (issue tracker, triage labels, domain docs) for the mattpocock skills | Copied into the repo | Re-run the install command |
 | `CLAUDE.md` section on agent skills, the git workflow and deploys | Between `<!-- claude-kit:start -->` and `<!-- claude-kit:end -->` in the repo's `CLAUDE.md` | Re-run the install command |
@@ -67,6 +69,7 @@ Updates arrive at most ten minutes into a session and take effect on the next la
 - **Skill or hook:** edit it under `plugins/`. There is no `version` in `plugin.json` on purpose, so every commit to `main` is a new version for everyone.
 - **Workflow:** edit `.github/workflows/` here (the reusable part). Triggers and permissions sit in `templates/workflows/` and only reach a repo when the install command is re-run. A caller's permissions cap what the reusable workflow can get, so a new permission must be added in both places.
 - **CLAUDE.md text or agent docs:** edit `templates/`. Repos pick it up when they re-run the install command.
+- **Third-party plugin (mattpocock-skills, taste-skill):** they run in everyone's sessions, so they're pinned to a commit someone has looked at. To bump one, read the upstream diff between the old and new commit (hooks, MCP servers and scripts in particular), then change its `sha` in `.claude-plugin/marketplace.json` in a PR. Use `url` sources with `https://…git` so people without SSH keys can install them.
 - Check plugin manifests with `claude plugin validate ./`.
 - Test the installer against a local checkout: `KIT_DIR=/path/to/claude-kit bash /path/to/claude-kit/install.sh` from inside a test repo.
 
