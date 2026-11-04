@@ -15,4 +15,6 @@ jobs:
       issues: read
       id-token: write
     uses: easyrate/claude-kit/.github/workflows/thermo-nuclear-review.yml@main
-    secrets: inherit
+    secrets:
+      # Passed explicitly: "inherit" only works when this repo and claude-kit are in the same org.
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
