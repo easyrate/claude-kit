@@ -15,13 +15,16 @@ END="<!-- claude-kit:end -->"
 
 cloudflare=0
 ref=main
+base=
 while [ $# -gt 0 ]; do
   case $1 in
     --cloudflare) cloudflare=1 ;;
     --ref) ref=$2; shift ;;
+    --base) base=$2; shift ;;
     -h|--help)
-      echo "Usage: install.sh [--cloudflare] [--ref <branch|tag>]   (run from inside the target repo)"
-      echo "Options: --cloudflare (also block wrangler deploys), --ref <branch|tag> (default main)"
+      echo "Usage: install.sh [--cloudflare] [--ref <branch|tag>] [--base <branch>]   (run from inside the target repo)"
+      echo "Options: --cloudflare (also block wrangler deploys), --ref <branch|tag> (default main),"
+      echo "         --base <branch> (branch PRs target, e.g. dev; default main, remembered on re-runs)"
       exit 0 ;;
     *) echo "Unknown option: $1" >&2; exit 1 ;;
   esac
@@ -64,13 +67,26 @@ if [ ! -f docs/agents/triage-labels.md ]; then cp "$t/docs/agents/triage-labels.
 say "docs/agents/ updated"
 
 # 2. CLAUDE.md: replace the managed block, or append it.
+# The PR base branch: --base, else what the existing block says, else main.
+if [ -z "$base" ] && [ -f CLAUDE.md ]; then
+  base=$(sed -n '/claude-kit:start/,/claude-kit:end/s/.*gh pr create --base \([A-Za-z0-9._\/-]*\).*/\1/p' CLAUDE.md | head -1)
+fi
+base=${base:-main}
 block=$(mktemp)
 {
   echo "$START"
-  sed "s#{{REPO}}#$repo#g" "$t/CLAUDE.core.md"
+  sed "s#{{REPO}}#$repo#g; s#{{BASE}}#$base#g" "$t/CLAUDE.core.md"
   if [ "$cloudflare" = 1 ]; then cat "$t/CLAUDE.cloudflare.md"; fi
   echo "$END"
 } > "$block"
+# A symlinked CLAUDE.md (often -> AGENTS.md) becomes a real file that imports its target,
+# so the managed block never gets written into the target file.
+if [ -L CLAUDE.md ]; then
+  target=$(readlink CLAUDE.md)
+  rm CLAUDE.md
+  printf '@%s\n' "$target" > CLAUDE.md
+  say "CLAUDE.md was a symlink to $target; it is now a file that imports @$target"
+fi
 touch CLAUDE.md
 if grep -qF "claude-kit:start" CLAUDE.md; then
   awk -v blockfile="$block" '
@@ -83,7 +99,7 @@ else
   cat "$block" >> CLAUDE.md
 fi
 rm -f "$block"
-say "CLAUDE.md managed block updated"
+say "CLAUDE.md managed block updated (PRs target $base)"
 
 # 3. .claude/settings.json: register the marketplace and enable the plugins (other settings are kept).
 mkdir -p .claude

@@ -16,6 +16,12 @@ For a Cloudflare Workers repo, which also blocks agents from deploying:
 curl -fsSL https://raw.githubusercontent.com/easyrate/claude-kit/main/install.sh | bash -s -- --cloudflare
 ```
 
+If feature PRs in the repo target another branch than `main` (e.g. `dev`), add `--base dev`. The `CLAUDE.md` text then says to branch off `dev` and open PRs against it, and later runs remember it:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/easyrate/claude-kit/main/install.sh | bash -s -- --base dev
+```
+
 Needs `git`, `jq` and `curl`. `gh` is optional; with it the installer also creates the `agent-review` label and checks the secret. The installer never commits: review `git diff`, then commit on a branch and open a PR.
 
 Then make sure the repo (or the org) has the `CLAUDE_CODE_OAUTH_TOKEN` secret. The installer tells you if it's missing:
@@ -40,7 +46,7 @@ Re-running the command is safe. It updates what it installed and leaves the rest
 What the installer changes in the target repo:
 
 - `.claude/settings.json`: registers this marketplace (`extraKnownMarketplaces`, with `autoUpdate`) and enables the plugins (`enabledPlugins`). Other settings are kept.
-- `CLAUDE.md`: adds or replaces the managed block. Write your own text outside the markers.
+- `CLAUDE.md`: adds or replaces the managed block. Write your own text outside the markers. If `CLAUDE.md` is a symlink (e.g. to `AGENTS.md`), it becomes a real file that imports the target (`@AGENTS.md`), so the target file is never changed.
 - `docs/agents/`: `domain.md` and `issue-tracker.md` are overwritten. `triage-labels.md` is only created if it's missing, so you can edit the label names.
 - `.github/workflows/claude.yml`, `claude-code-review.yml`, `thermo-nuclear-review.yml`: overwritten with callers of the workflows here.
 - `.gitignore`: adds `.claude/worktrees/`.
