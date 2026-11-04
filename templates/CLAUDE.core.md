@@ -14,4 +14,4 @@ Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/ag
 
 ## Git workflow
 
-Never push directly to `main`; every change reaches `main` through a pull request. Before coding, branch off an up-to-date `main` (`git switch main && git pull && git switch -c <type>/<short-name>`, e.g. `feat/meta-pixel-stats`, `fix/consent-check`), push the branch, and open a PR with `gh pr create`. The `easyrate-core` plugin (from claude-kit) has a hook that enforces this.
+Never push directly to `main`; every change reaches `main` through a pull request. Before coding, branch off an up-to-date `{{BASE}}` (`git switch {{BASE}} && git pull && git switch -c <type>/<short-name>`, e.g. `feat/meta-pixel-stats`, `fix/consent-check`), push the branch, and open a PR against `{{BASE}}` with `gh pr create --base {{BASE}}`. The `easyrate-core` plugin (from claude-kit) has a hook that enforces this.
