@@ -23,6 +23,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Install deps so Claude can type-check and test. Skipped in repos without an npm lockfile.
+      # pull_request events check out the PR merge commit, so the generated Prisma client matches the PR.
+      - uses: actions/setup-node@v4
+        if: hashFiles('package-lock.json') != ''
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        if: hashFiles('package-lock.json') != ''
+        run: |
+          npm ci
+          if [ -f prisma/schema.prisma ]; then npx prisma generate; fi
+
       - name: Fetch the review skill from claude-kit
         uses: actions/checkout@v4
         with:
@@ -46,8 +60,11 @@ jobs:
             itself; it is not part of the PR.
 
             Tool rules for this environment: the only shell commands allowed are
-            plain `gh pr diff`, `gh pr view` and `gh pr comment`, each run on its own
-            with no pipes, redirects, `&&`/`;` chains, loops or shell variables.
+            plain `gh pr diff`, `gh pr view`, `gh pr comment`, `npx tsc --noEmit`,
+            `npm run lint`, `npx vitest run` and `npm test`, each run on its own
+            with no pipes, redirects, `&&`/`;` chains, `cd`, loops or shell variables.
+            If the repo has a tsconfig.json, run `npx tsc --noEmit` once and treat
+            type errors in files this PR touches as findings.
             Do not write to /tmp or anywhere outside the workspace. Use the Read, Glob
             and Grep tools to inspect files, not shell commands.
 
@@ -59,4 +76,4 @@ jobs:
           claude_args: |
             --model claude-opus-5-5
             --max-turns 60
-            --allowedTools "Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*)"
+            --allowedTools "Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),Bash(npx tsc:*),Bash(npm run lint:*),Bash(npx vitest:*),Bash(npm test:*)"
