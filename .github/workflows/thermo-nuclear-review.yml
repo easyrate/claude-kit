@@ -45,6 +45,12 @@ jobs:
             and read surrounding files as needed for context. Ignore the .claude-kit folder
             itself; it is not part of the PR.
 
+            Tool rules for this environment: the only shell commands allowed are
+            plain `gh pr diff`, `gh pr view` and `gh pr comment`, each run on its own
+            with no pipes, redirects, `&&`/`;` chains, loops or shell variables.
+            Do not write to /tmp or anywhere outside the workspace. Use the Read, Glob
+            and Grep tools to inspect files, not shell commands.
+
             Post each specific finding as an inline comment on the relevant line.
             Then post one summary comment on the PR with `gh pr comment` that lists
             findings in the skill's priority order and gives a clear verdict
