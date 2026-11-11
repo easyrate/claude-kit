@@ -45,7 +45,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           additional_permissions: |
             actions: read
-          show_full_output: true # TEMP: debugging is_error failure; revert after
-          # Read-only checks only: anyone who can comment @claude can trigger these.
+          # Checks only: anyone who can comment @claude can trigger these. prisma generate is needed
+          # because the install step runs on the default branch, before the action checks out the PR.
           claude_args: |
-            --allowedTools "Bash(npx tsc:*),Bash(npm run lint:*),Bash(npx vitest:*),Bash(npm test:*)"
+            --allowedTools "Bash(npx prisma generate:*),Bash(npx tsc:*),Bash(npm run lint:*),Bash(npx vitest:*),Bash(npm test:*)"
