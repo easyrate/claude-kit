@@ -45,6 +45,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           additional_permissions: |
             actions: read
+          show_full_output: true # TEMP: catching intermittent is_error after 2 turns; revert after
           # Checks only: anyone who can comment @claude can trigger these. prisma generate is needed
           # because the install step runs on the default branch, before the action checks out the PR.
           claude_args: |
