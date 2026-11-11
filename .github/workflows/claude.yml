@@ -27,8 +27,24 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Install deps so Claude can type-check, lint and test. Skipped in repos without an npm lockfile.
+      - uses: actions/setup-node@v4
+        if: hashFiles('package-lock.json') != ''
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        if: hashFiles('package-lock.json') != ''
+        run: |
+          npm ci
+          if [ -f prisma/schema.prisma ]; then npx prisma generate; fi
+
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           additional_permissions: |
             actions: read
+          # Read-only checks only: anyone who can comment @claude can trigger these.
+          claude_args: |
+            --allowedTools "Bash(npx tsc:*),Bash(npm run lint:*),Bash(npx vitest:*),Bash(npm test:*)"
