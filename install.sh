@@ -143,6 +143,13 @@ if command -v gh >/dev/null && gh auth status >/dev/null 2>&1 && [ "$repo" != "<
   fi
 fi
 
+# claude-code-action only runs when a PR's workflow file matches the default branch's copy.
+if [ "$base" != main ] && [ -n "$(git status --porcelain -- .github/workflows)" ]; then
+  echo
+  echo "  ! PRs here target '$base'. The Claude workflows only run once the changed .github/workflows/"
+  echo "    files are also on the default branch, so get them there too (release merge or a small PR)."
+fi
+
 echo
 echo "Done. Review the changes, then commit them on a branch and open a PR:"
 git status --short -- CLAUDE.md .claude/settings.json docs/agents .github/workflows .gitignore | sed 's/^/  /'

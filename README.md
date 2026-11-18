@@ -33,6 +33,8 @@ gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo <owner>/<repo>
 
 Re-running the command is safe. It updates what it installed and leaves the rest alone.
 
+**The workflow files must also reach the repo's default branch.** `claude-code-action` only runs when a workflow file in a PR is identical to the one on the default branch; otherwise it logs "Skipping action due to workflow validation" and the job still passes, so nothing gets posted. If PRs target another branch than the default (`--base dev`), get the changed `.github/workflows/` files onto the default branch too, either with your normal release merge or a small PR with just those files. This applies every time you re-run the installer and it changes a workflow file.
+
 ## What you get
 
 | What | Where it lives | How it updates |
