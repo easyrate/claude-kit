@@ -22,7 +22,7 @@ If feature PRs in the repo target another branch than `main` (e.g. `dev`), add `
 curl -fsSL https://raw.githubusercontent.com/easyrate/claude-kit/main/install.sh | bash -s -- --base dev
 ```
 
-Needs `git`, `jq` and `curl`. `gh` is optional; with it the installer also creates the `agent-review` label and checks the secret. The installer never commits: review `git diff`, then commit on a branch and open a PR.
+Needs `git`, `jq` and `curl`. `gh` is optional; with it the installer also creates the `agent-review` and `agent-security-review` labels and checks the secret. The installer never commits: review `git diff`, then commit on a branch and open a PR.
 
 Then make sure the repo (or the org) has the `CLAUDE_CODE_OAUTH_TOKEN` secret. The installer tells you if it's missing:
 
@@ -37,11 +37,11 @@ Re-running the command is safe. It updates what it installed and leaves the rest
 
 | What | Where it lives | How it updates |
 | --- | --- | --- |
-| `easyrate-core` plugin: hook that blocks `git push` to `main`; `/easyrate-core:thermo-nuclear-code-quality-review` skill | `plugins/easyrate-core` | Automatically (plugin auto-update) |
+| `easyrate-core` plugin: hook that blocks `git push` to `main`; `/easyrate-core:thermo-nuclear-code-quality-review` and `/easyrate-core:security-review` skills | `plugins/easyrate-core` | Automatically (plugin auto-update) |
 | `easyrate-cloudflare` plugin (`--cloudflare`): hook that blocks `wrangler deploy`, `rollback`, `delete`, `secret put/delete`, `npm run deploy`, `scripts/setup.sh`. `wrangler deploy --dry-run` is allowed | `plugins/easyrate-cloudflare` | Automatically |
 | `mattpocock-skills` plugin: Matt Pocock's engineering skills (`/mattpocock-skills:tdd`, `…:grilling`, `…:triage`, `…:code-review`, …) | Upstream [mattpocock/skills](https://github.com/mattpocock/skills), pinned by commit in `.claude-plugin/marketplace.json` | When the pin is bumped here |
 | `taste-skill` plugin: art direction for websites, product pages, dashboards and app screens (`/taste-skill:taste-skill`) | Upstream [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), pinned by commit | When the pin is bumped here |
-| GitHub workflows: `@claude` in issues and PRs; Claude Code Review and the thermo-nuclear review when a PR gets the `agent-review` label | Logic in `.github/workflows/` here; each repo has short caller files | Automatically (reusable workflows, `@main`) |
+| GitHub workflows: `@claude` in issues and PRs; Claude Code Review and the thermo-nuclear review when a PR gets the `agent-review` label; the security review when it gets the `agent-security-review` label | Logic in `.github/workflows/` here; each repo has short caller files | Automatically (reusable workflows, `@main`) |
 | `docs/agents/*.md` (issue tracker, triage labels, domain docs) for the mattpocock skills | Copied into the repo | Re-run the install command |
 | `CLAUDE.md` section on agent skills, the git workflow and deploys | Between `<!-- claude-kit:start -->` and `<!-- claude-kit:end -->` in the repo's `CLAUDE.md` | Re-run the install command |
 
@@ -50,7 +50,7 @@ What the installer changes in the target repo:
 - `.claude/settings.json`: registers this marketplace (`extraKnownMarketplaces`, with `autoUpdate`) and enables the plugins (`enabledPlugins`). Other settings are kept.
 - `CLAUDE.md`: adds or replaces the managed block. Write your own text outside the markers. If `CLAUDE.md` is a symlink (e.g. to `AGENTS.md`), it becomes a real file that imports the target (`@AGENTS.md`), so the target file is never changed.
 - `docs/agents/`: `domain.md` and `issue-tracker.md` are overwritten. `triage-labels.md` is only created if it's missing, so you can edit the label names.
-- `.github/workflows/claude.yml`, `claude-code-review.yml`, `thermo-nuclear-review.yml`: overwritten with callers of the workflows here.
+- `.github/workflows/claude.yml`, `claude-code-review.yml`, `thermo-nuclear-review.yml`, `security-review.yml`: overwritten with callers of the workflows here.
 - `.gitignore`: adds `.claude/worktrees/`.
 
 ## For teammates
@@ -67,10 +67,10 @@ Updates arrive at most ten minutes into a session and take effect on the next la
 ## Changing the kit
 
 - **Skill or hook:** edit it under `plugins/`. There is no `version` in `plugin.json` on purpose, so every commit to `main` is a new version for everyone.
-- **Workflow:** edit `.github/workflows/` here (the reusable part). Triggers and permissions sit in `templates/workflows/` and only reach a repo when the install command is re-run. A caller's permissions cap what the reusable workflow can get, so a new permission must be added in both places.
+- **Workflow:** edit `.github/workflows/` here (the reusable part). Triggers, permissions and the `kit_ref` input sit in `templates/workflows/` and only reach a repo when the install command is re-run. A caller's permissions cap what the reusable workflow can get, so a new permission must be added in both places.
 - **CLAUDE.md text or agent docs:** edit `templates/`. Repos pick it up when they re-run the install command.
 - **Third-party plugin (mattpocock-skills, taste-skill):** they run in everyone's sessions, so they're pinned to a commit someone has looked at. To bump one, read the upstream diff between the old and new commit (hooks, MCP servers and scripts in particular), then change its `sha` in `.claude-plugin/marketplace.json` in a PR. Use `url` sources with `https://…git` so people without SSH keys can install them.
 - Check plugin manifests with `claude plugin validate ./`.
 - Test the installer against a local checkout: `KIT_DIR=/path/to/claude-kit bash /path/to/claude-kit/install.sh` from inside a test repo.
 
-Pin a repo to a tag instead of `main` with `--ref v1`. That pins the workflow callers and the downloaded templates; plugins always follow `main`.
+Pin a repo to a tag instead of `main` with `--ref v1`. That pins the workflow callers, the review instructions they read and the downloaded templates; plugins always follow `main`.

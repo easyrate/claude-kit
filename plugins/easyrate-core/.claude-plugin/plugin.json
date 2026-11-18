@@ -1,5 +1,5 @@
 {
   "name": "easyrate-core",
-  "description": "Blocks direct pushes to main; thermo-nuclear code quality review skill",
+  "description": "Blocks direct pushes to main; thermo-nuclear code quality review and security review skills",
   "author": { "name": "easyrate" }
 }

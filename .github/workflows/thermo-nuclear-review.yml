@@ -5,6 +5,11 @@ name: Thermo-nuclear review
 
 on:
   workflow_call:
+    inputs:
+      kit_ref:
+        description: claude-kit branch or tag to read the review skill from; the installer sets it to the caller's --ref.
+        type: string
+        default: main
     secrets:
       CLAUDE_CODE_OAUTH_TOKEN:
         required: true
@@ -41,6 +46,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: easyrate/claude-kit
+          ref: ${{ inputs.kit_ref }}
           path: .claude-kit
           sparse-checkout: plugins/easyrate-core/skills
 
