@@ -116,9 +116,9 @@ say ".claude/settings.json: plugins enabled"
 # 4. GitHub workflows: thin callers of the reusable workflows in claude-kit.
 mkdir -p .github/workflows
 for f in "$t"/workflows/*.yml; do
-  sed "s#@main\$#@$ref#" "$f" > ".github/workflows/$(basename "$f")"
+  sed "s#@main\$#@$ref#; s#kit_ref: main\$#kit_ref: $ref#" "$f" > ".github/workflows/$(basename "$f")"
 done
-say ".github/workflows/: claude.yml, claude-code-review.yml, thermo-nuclear-review.yml"
+say ".github/workflows/: claude.yml, claude-code-review.yml, thermo-nuclear-review.yml, security-review.yml"
 
 # 5. .gitignore: Claude Code worktrees
 if ! grep -qxF ".claude/worktrees/" .gitignore 2>/dev/null; then
@@ -131,6 +131,10 @@ if command -v gh >/dev/null && gh auth status >/dev/null 2>&1 && [ "$repo" != "<
   if gh label create agent-review --repo "$repo" --color 5319e7 \
        --description "Runs the Claude code reviews" --force >/dev/null 2>&1; then
     say "GitHub label 'agent-review' ready"
+  fi
+  if gh label create agent-security-review --repo "$repo" --color b60205 \
+       --description "Runs the Claude security review" --force >/dev/null 2>&1; then
+    say "GitHub label 'agent-security-review' ready"
   fi
   if ! gh secret list --repo "$repo" --json name -q '.[].name' 2>/dev/null | grep -qx CLAUDE_CODE_OAUTH_TOKEN; then
     echo
